@@ -1,0 +1,159 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7f4">
+  <meta name="description" content="Gérez simplement votre collection de livres et leurs emprunts.">
+  <title>Smart Library — Ma bibliothèque</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="Smart Library, accueil">
+      <span class="brand-mark" aria-hidden="true">SL</span>
+      <span>smart<span class="brand-light">library</span></span>
+    </a>
+    <span class="local-badge"><span aria-hidden="true"></span> Bibliothèque personnelle</span>
+  </header>
+
+  <main class="page-shell">
+    <section class="intro" aria-labelledby="page-title">
+      <div>
+        <p class="eyebrow">VOTRE COLLECTION, EN UN CLIN D’ŒIL</p>
+        <h1 id="page-title">Une bibliothèque <span>bien organisée.</span></h1>
+        <p class="intro-copy">Gardez vos lectures à portée de main et sachez toujours quels livres sont disponibles.</p>
+      </div>
+      <div class="intro-decoration" aria-hidden="true">
+        <span class="decor-book decor-book-one"></span>
+        <span class="decor-book decor-book-two"></span>
+        <span class="decor-book decor-book-three"></span>
+      </div>
+    </section>
+
+    <section class="stats-grid" aria-label="Résumé de la collection">
+      <article class="stat-card stat-total">
+        <span class="stat-label">Total des livres</span>
+        <strong class="stat-value" id="total-books">0</strong>
+        <span class="stat-caption">dans votre collection</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-icon available-icon" aria-hidden="true">✓</span>
+        <span class="stat-label">Disponibles</span>
+        <strong class="stat-value" id="available-books">0</strong>
+        <span class="stat-caption">prêts à être empruntés</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-icon borrowed-icon" aria-hidden="true">↗</span>
+        <span class="stat-label">Empruntés</span>
+        <strong class="stat-value" id="borrowed-books">0</strong>
+        <span class="stat-caption">à retrouver bientôt</span>
+      </article>
+    </section>
+
+    <div id="app-notice" class="notice" role="alert" hidden></div>
+
+    <div class="workspace">
+      <aside class="form-panel panel" aria-labelledby="form-title">
+        <div class="panel-heading">
+          <div class="heading-icon" aria-hidden="true">+</div>
+          <div>
+            <p class="eyebrow">AGRANDISSEZ VOTRE COLLECTION</p>
+            <h2 id="form-title">Ajouter un livre</h2>
+          </div>
+        </div>
+
+        <form id="book-form">
+          <label class="field">
+            <span>Titre <span class="required-mark" aria-hidden="true">*</span></span>
+            <input id="title" name="title" type="text" maxlength="160" placeholder="Ex. Le Petit Prince" autocomplete="off" required>
+          </label>
+          <label class="field">
+            <span>Auteur <span class="required-mark" aria-hidden="true">*</span></span>
+            <input id="author" name="author" type="text" maxlength="120" placeholder="Ex. Antoine de Saint-Exupéry" autocomplete="off" required>
+          </label>
+          <label class="field">
+            <span>Catégorie <span class="required-mark" aria-hidden="true">*</span></span>
+            <input id="category" name="category" type="text" maxlength="60" placeholder="Ex. Roman" list="category-suggestions" autocomplete="off" required>
+            <datalist id="category-suggestions"></datalist>
+          </label>
+          <label class="field">
+            <span>ISBN <span class="optional-label">facultatif</span></span>
+            <input id="isbn" name="isbn" type="text" maxlength="24" placeholder="Ex. 978-2-07-036002-4" autocomplete="off">
+            <small>ISBN-10 ou ISBN-13</small>
+          </label>
+          <p id="form-message" class="form-message" aria-live="polite"></p>
+          <button class="button button-primary submit-button" type="submit">
+            <span aria-hidden="true">+</span> Ajouter à ma bibliothèque
+          </button>
+          <p class="form-footnote"><span aria-hidden="true">*</span> Champs obligatoires</p>
+        </form>
+      </aside>
+
+      <section class="collection-panel panel" aria-labelledby="collection-title">
+        <div class="collection-heading">
+          <div>
+            <p class="eyebrow">TOUS VOS OUVRAGES</p>
+            <h2 id="collection-title">Ma bibliothèque</h2>
+          </div>
+          <span id="visible-count" class="result-count">0 livre</span>
+        </div>
+
+        <div class="toolbar" role="search">
+          <label class="search-field">
+            <span class="sr-only">Rechercher par titre, auteur ou ISBN</span>
+            <span class="search-icon" aria-hidden="true"></span>
+            <input id="search-input" type="search" placeholder="Rechercher un livre..." autocomplete="off">
+          </label>
+          <div class="filter-row">
+            <label class="select-field">
+              <span class="sr-only">Filtrer par statut</span>
+              <select id="status-filter">
+                <option value="all">Tous les statuts</option>
+                <option value="DISPONIBLE">Disponibles</option>
+                <option value="EMPRUNTE">Empruntés</option>
+              </select>
+            </label>
+            <label class="select-field">
+              <span class="sr-only">Filtrer par catégorie</span>
+              <select id="category-filter">
+                <option value="all">Toutes les catégories</option>
+              </select>
+            </label>
+            <label class="select-field sort-field">
+              <span class="sr-only">Trier la liste</span>
+              <select id="sort-order">
+                <option value="newest">Ajout récent</option>
+                <option value="oldest">Ajout ancien</option>
+                <option value="title">Titre A–Z</option>
+                <option value="author">Auteur A–Z</option>
+              </select>
+            </label>
+            <button id="clear-filters" class="button button-text" type="button">Effacer</button>
+          </div>
+        </div>
+
+        <div id="book-list" class="book-grid" role="list" aria-live="polite"></div>
+        <div id="empty-library" class="empty-state" hidden>
+          <div class="empty-illustration" aria-hidden="true">▤</div>
+          <h3>Bienvenue dans votre bibliothèque&nbsp;!</h3>
+          <p>Votre collection est vide pour l’instant. Ajoutez un premier livre pour commencer.</p>
+          <button id="empty-add-button" class="button button-secondary" type="button">Ajouter mon premier livre</button>
+        </div>
+        <div id="no-results" class="empty-state compact-empty" hidden>
+          <div class="empty-illustration" aria-hidden="true">⌕</div>
+          <h3>Aucun livre ne correspond à votre recherche</h3>
+          <p>Essayez un autre terme ou réinitialisez la recherche et les filtres.</p>
+          <button id="no-results-clear" class="button button-secondary" type="button">Réinitialiser la recherche et les filtres</button>
+        </div>
+      </section>
+    </div>
+
+    <footer class="page-footer">
+      <span>Smart Library</span>
+      <span>Vos données restent enregistrées dans ce navigateur.</span>
+    </footer>
+  </main>
+</body>
+</html>
